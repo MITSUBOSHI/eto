@@ -1,0 +1,3 @@
+[submodule "etoji"]
+	path = etoji
+	url = git@github.com:MITSUBOSHI/etoji.git
