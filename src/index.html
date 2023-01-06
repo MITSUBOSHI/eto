@@ -4,17 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-  <title></title>
+  <title>Etoji</title>
+  <style>
+    body {
+      background-image: url("./images/background.jpg");
+      background-size: cover;
+    }
+  </style>
 </head>
 <body>
-  <div class="container-sm p-5">
-    <button type="button" class="btn btn-sm btn-primary my-3 px-3" onclick="main()">Run</button>
-    <div id="result"></div>
+  <div class="container-sm p-5 col-md-10 flex-column">
+    <div id="prev-result" class="d-flex justify-content-center display-6"></div>
+    <div id="current-result" class="d-flex justify-content-center display-3"></div>
+    <div id="next-result" class="d-flex justify-content-center display-6"></div>
+    <div class="form-row">
+      <div class="form-group text-center">
+        <input id="year-input" type="number" min="1" max="3000" class="mt-4 w-40" />
+      </div>
+      <div class="form-group text-center">
+        <button type="button" class="btn btn-lg btn-primary mt-4" onclick="main()">Run</button>
+      </div>
+    </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/ruby-head-wasm-wasi@latest/dist/browser.umd.js"></script>
   <script>
 
     const { DefaultRubyVM } = window["ruby-wasm-wasi"];
+    const defaultYear = new Date().getFullYear();
     const main = async () => {
       const response = await fetch('./etoji.wasm')
       const buffer = await response.arrayBuffer();
@@ -23,6 +39,9 @@
       const { vm } = await DefaultRubyVM(module);
 
       vm.printVersion();
+
+      const inputYear = document.getElementById('year-input').value
+      console.log(inputYear);
       const res = vm.eval(`
         load "etoji/lib/etoji.rb"
 
@@ -41,12 +60,24 @@
             }.to_json
           end
         end
-        CurrentAnimalDetector.new(year: 2023).detect
+        input_year = ${inputYear}
+        default_year = ${defaultYear}
+        selected_year = (input_year.to_s.empty?) ? default_year : input_year
+        CurrentAnimalDetector.new(year: selected_year).detect
       `)
 
-      const result = document.getElementById('result')
-      console.log(res.toString);
-      result.innerText = res.toString()
+      const json_string = res.toString()
+      const obj = JSON.parse(json_string)
+
+      const prevResult = document.getElementById('prev-result')
+      console.log(obj.prev);
+      prevResult.innerText = `${obj.prev.emoji} ... ${obj.prev.year} (${obj.prev.character}年)`
+
+      const currentResult = document.getElementById('current-result')
+      currentResult.innerText = `${obj.current.emoji} ... ${obj.current.year} (${obj.current.character}年)`
+
+      const nextResult = document.getElementById('next-result')
+      nextResult.innerText = `${obj.next.emoji} ... ${obj.next.year} (${obj.next.character}年)`
     }
     main();
   </script>
