@@ -12,7 +12,7 @@
     }
   </style>
 </head>
-<body>
+<body onload="main()">
   <div class="container-sm p-5 col-md-10 flex-column">
     <div id="prev-result" class="d-flex justify-content-center display-6"></div>
     <div id="current-result" class="d-flex justify-content-center display-3"></div>
@@ -75,7 +75,6 @@
       const nextResult = document.getElementById('next-result')
       nextResult.innerText = `${obj.next.emoji} ... ${obj.next.year} (${obj.next.character}年)`
     }
-    main();
   </script>
 </body>
 </html>
