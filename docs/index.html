@@ -38,10 +38,7 @@
 
       const { vm } = await DefaultRubyVM(module);
 
-      vm.printVersion();
-
       const inputYear = document.getElementById('year-input').value
-      console.log(inputYear);
       const res = vm.eval(`
         load "etoji/lib/etoji.rb"
 
@@ -70,7 +67,6 @@
       const obj = JSON.parse(json_string)
 
       const prevResult = document.getElementById('prev-result')
-      console.log(obj.prev);
       prevResult.innerText = `${obj.prev.emoji} ... ${obj.prev.year} (${obj.prev.character}年)`
 
       const currentResult = document.getElementById('current-result')
