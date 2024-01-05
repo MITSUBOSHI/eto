@@ -12,7 +12,7 @@
     }
   </style>
 </head>
-<body onload="main()">
+<body onload="setup()">
   <div class="container-sm p-5 col-md-10 flex-column">
     <div id="prev-result" class="d-flex justify-content-center display-6"></div>
     <div id="current-result" class="d-flex justify-content-center display-3"></div>
@@ -31,13 +31,22 @@
 
     const { DefaultRubyVM } = window["ruby-wasm-wasi"];
     const defaultYear = new Date().getFullYear();
-    const main = async () => {
+    let vm;
+
+    const setup = async() => {
+      await init();
+      await main();
+    }
+
+    const init = async() => {
       const response = await fetch('./etoji.wasm')
       const buffer = await response.arrayBuffer();
-      const module = await WebAssembly.compile(buffer)
+      const module = await WebAssembly.compile(buffer);
+      const rubyVm = await DefaultRubyVM(module);
+      vm = rubyVm.vm;
+    }
 
-      const { vm } = await DefaultRubyVM(module);
-
+    const main = async () => {
       const inputYear = document.getElementById('year-input').value
       const res = vm.eval(`
         load "etoji/lib/etoji.rb"
